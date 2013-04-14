@@ -179,9 +179,10 @@ def mysql(command=None):
 
     host = settings.hosts_mapping[env.get('host')][1]
     start = (
-        'mysqld --wsrep_cluster_address="'
-        'gcomm://mambalancer,mambaone,mambatwo?{}" '
-        '> /tmp/mariadb_cluster.log 2>&1 &'.format(host)
+        'mysqld --wsrep_cluster_address="gcomm://{}?{}" '
+	'> /tmp/mariadb_cluster.log 2>&1 &'.format(
+	    settings.hosts_plain_list, host
+        )
     )
     stop = 'kill $(ps ax | grep -v grep | grep mysqld | awk \'{print $1}\')'
 
