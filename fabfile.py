@@ -141,6 +141,12 @@ def install_galera():
         run(
             'mysql -u root -p{} -e "GRANT ALL PRIVILEGES ON *.* TO '
             '\'root\'@\'%\' WITH GRANT OPTION;"')
+        import daemon_script
+        run('echo "{script}" > /usr/local/bin/mariadbcd'.format(
+            script=daemon_script.daemon_script.format(
+                settings.hosts_mapping[env.get('host')][1]
+            )))
+        run('chmod u+x > /usr/local/bin/mariadbcd')
         run('update-rc.d -f mysql remove')
         run('service mysql stop')
         import my_cnf
@@ -177,13 +183,6 @@ def mysql(command=None):
     """Controls the MySQL cluster: start, stop, status, restart
     """
 
-    host = settings.hosts_mapping[env.get('host')][1]
-    start = (
-        'mysqld --wsrep_cluster_address="gcomm://{}?{}" '
-	'> /tmp/mariadb_cluster.log 2>&1 &'.format(
-	    settings.hosts_plain_list, host
-        )
-    )
     stop = 'kill $(ps ax | grep -v grep | grep mysqld | awk \'{print $1}\')'
 
     if command not in ('status', 'stop', 'start', 'restart'):
@@ -204,7 +203,7 @@ def mysql(command=None):
         else:
             if command == 'start':
                 with quiet():
-                    result = run(start)
+                    result = run('mariadbcd', pty=False)
 
                 if result.failed is False:
                     puts('MariaDB Cluster Node Started')
@@ -216,7 +215,7 @@ def mysql(command=None):
             elif command == 'restart':
                 with quiet():
                     run(stop)
-                    result = run(start)
+                    result = run('mariadbcd', pty=False)
 
                 if result.failed is False:
                     puts('MariaDB Cluster Node Restarted')
