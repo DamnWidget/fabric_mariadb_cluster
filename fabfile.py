@@ -31,7 +31,9 @@ from fabric.utils import puts, warn
 from fabric.api import run, quiet, env
 from fabric.decorators import hosts, parallel
 
+import my_cnf
 import settings
+import daemon_script
 
 
 @parallel
@@ -141,7 +143,6 @@ def install_galera():
         run(
             'mysql -u root -p{} -e "GRANT ALL PRIVILEGES ON *.* TO '
             '\'root\'@\'%\' WITH GRANT OPTION;"')
-        import daemon_script
         run('echo "{script}" > /usr/local/bin/mariadbcd'.format(
             script=daemon_script.daemon_script.format(
                 settings.hosts_mapping[env.get('host')][1]
@@ -149,7 +150,6 @@ def install_galera():
         run('chmod u+x > /usr/local/bin/mariadbcd')
         run('update-rc.d -f mysql remove')
         run('service mysql stop')
-        import my_cnf
         run('echo "{my_cnf}" > /etc/mysql/my.cnf'.format(
             my_cnf=my_cnf.mariadb_conf.format(
                 settings=settings, host_name=host_name, donor=donor)))
