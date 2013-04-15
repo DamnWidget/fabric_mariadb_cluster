@@ -40,7 +40,7 @@ innodb_autoinc_lock_mode=2
 # * wsrep provider configuration: basic wsrep options
 #
 wsrep_provider=/usr/lib/galera/libgalera_smm.so
-wsrep_provider_options="gcache.size=32G; gcache.page_size=1G"
+wsrep_provider_options="gcache.size=2G; gcache.page_size=1G"
 wsrep_cluster_address=gcomm://{settings.hosts_plain_list}
 wsrep_cluster_name='{settings.cluster_name}'
 wsrep_node_address='{host_name}'
